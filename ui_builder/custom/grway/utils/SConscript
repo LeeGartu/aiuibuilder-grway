@@ -1,0 +1,14 @@
+Import('AIC_ROOT')
+Import('PRJ_KERNEL')
+from building import *
+
+cwd = GetCurrentDir()
+CPPPATH = []
+src = []
+
+if GetDepend('GW_UTILS'):
+    src = Glob('src/*.c')
+    CPPPATH = [cwd]
+
+group = DefineGroup('gw-utils', src, depend = [''], CPPPATH = CPPPATH)
+Return('group')

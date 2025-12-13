@@ -1,0 +1,16 @@
+# Enforce LF line endings for all C/C++ files
+*.c    text eol=lf
+*.h    text eol=lf
+*.cpp  text eol=lf
+*.hpp  text eol=lf
+*.txt  text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.code-workspace text eol=lf
+.clang-format text eol=lf
+.gitignore text eol=lf
+config.ini text eol=lf
+SConscript text eol=lf
+
+# Make sure shell scripts are executable and use LF
+*.sh   text eol=lf executable

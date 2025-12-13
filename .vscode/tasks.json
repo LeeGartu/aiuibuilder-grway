@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "patch",
+            "type": "process",
+            "command":  "cmd.exe",
+            "args": [
+                "/c",
+                "xcopy",
+                ".\\script\\patch\\*",
+                ".",
+                "/E",
+                "/I",
+                "/Y"
+            ],
+            "presentation": {
+                "close": true
+            }
+        }
+    ]
+}

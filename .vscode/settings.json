@@ -1,0 +1,33 @@
+{
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.expand": false,
+	"explorer.fileNesting.patterns": {
+		".clang-tidy": ".clang-format, .clangd, compile_commands.json",
+		".gitignore": ".gitattributes, .gitmodules, .gitmessage, .lfsconfig, .mailmap, .git-blame*",
+		"config.ini": "*.aicpro, *.snapshot",
+		"ui_objects.h": "screen_*.c",
+		"*.c": "$(capture).h",
+		"*.cc": "$(capture).hpp, $(capture).h, $(capture).hxx, $(capture).hh",
+	},
+	"files.exclude": {
+		"build": true,
+		"data": true,
+		"resources": true,
+		"simulator/build": true,
+		"simulator/ffmpeg": true,
+		"simulator/freetype": true,
+		"simulator/lib": true,
+		"simulator/lvgl/env_support": true
+	},
+	"search.exclude": {
+		"build": true,
+		"data": true,
+		"resources": true,
+		"simulator": true,
+		"simulator/build": true,
+		"simulator/ffmpeg": true,
+		"simulator/freetype": true,
+		"simulator/lib": true,
+		"simulator/lvgl/env_support": true
+	},
+}
