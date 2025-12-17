@@ -17,6 +17,7 @@
 #define RT_USING_TIMER_SOFT
 #define RT_TIMER_THREAD_PRIO 4
 #define RT_TIMER_THREAD_STACK_SIZE 4096
+#define RT_USING_LIBC
 
 /* Inter-Thread communication */
 
@@ -26,6 +27,15 @@
 #define RT_USING_MAILBOX
 #define RT_USING_MESSAGEQUEUE
 /* end of Inter-Thread communication */
+
+/* Memory Management */
+
+#define RT_USING_MEMPOOL
+#define RT_USING_MEMHEAP
+#define RT_MEMHEAP_BSET_MODE
+#define RT_USING_MEMHEAP_AS_HEAP
+#define RT_USING_HEAP
+/* end of Memory Management */
 
 /* Kernel Device Object */
 

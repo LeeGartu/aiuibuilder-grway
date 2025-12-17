@@ -4,8 +4,6 @@ set(CMAKE_C_STANDARD 11)#C11
 set(CMAKE_CXX_STANDARD 17)#C17
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(rt-thread)
-
 set(FLASHDB FlashDB-1.1.2)
 file(GLOB_RECURSE FDB_SOURCES  "${FLASHDB}/src/*.c")
 file(GLOB_RECURSE BSP_SOURCES  "bsp/src/*.c")
@@ -30,6 +28,6 @@ target_include_directories(p PUBLIC
     ${PROJECT_SOURCE_DIR}/mach/inc/
 )
 
+add_subdirectory(rt-thread-grway)
 target_link_libraries(p PUBLIC rtthread)
-target_link_libraries(p PRIVATE Shlwapi)
 target_link_libraries(p PRIVATE libserialport)

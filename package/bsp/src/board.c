@@ -1,6 +1,7 @@
-#include "selectport.h"
+#include "uart.h"
 
 int board_init(void)
 {
-    return selectport();
+    uart_init();
+    return 0;
 }
