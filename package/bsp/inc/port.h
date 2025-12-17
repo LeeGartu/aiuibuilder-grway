@@ -2,7 +2,6 @@
 #define __PORT_H__
 
 #include <stdint.h>
-#include "windows.h"
 
 struct port_cfg {
 	char port_id[10];

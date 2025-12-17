@@ -1,6 +1,6 @@
-#ifndef __board__
-#define __board__
+#ifndef __BOARD_H__
+#define __BOARD_H__
 
 int board_init(void);
 
-#endif // !__board__
+#endif // !__BOARD_H__

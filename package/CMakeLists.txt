@@ -32,3 +32,4 @@ target_include_directories(p PUBLIC
 
 target_link_libraries(p PUBLIC rtthread)
 target_link_libraries(p PRIVATE Shlwapi)
+target_link_libraries(p PRIVATE libserialport)

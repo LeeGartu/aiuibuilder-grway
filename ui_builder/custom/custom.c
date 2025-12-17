@@ -177,16 +177,17 @@ void custom_timer(lv_timer_t * timer)
     printf("  Used blocks: %d\n", mon.used_cnt);
 }
 
-// #include "board.h"
+#include "board.h"
 void custom_init()
 {
-    // if (board_init() != 0) {
-    //     return;
-    // }
+    if (board_init() != 0) {
+        return;
+    }
+    return;
     /* Add your codes here */
     param_data_init();
     err_init();
 
-    lv_timer_create(custom_timer, 1000, NULL);
+    // lv_timer_create(custom_timer, 1000, NULL);
 }
 
