@@ -52,6 +52,20 @@ static void (*rt_thread_suspend_hook)(rt_thread_t thread);
 static void (*rt_thread_resume_hook) (rt_thread_t thread);
 static void (*rt_thread_inited_hook) (rt_thread_t thread);
 
+// 主线程：控制暂停/恢复
+void pause_thread(thread_control_t *ctrl) {
+    pthread_mutex_lock(&ctrl->mutex);
+    ctrl->paused = true;
+    pthread_mutex_unlock(&ctrl->mutex);
+}
+
+void resume_thread(thread_control_t *ctrl) {
+    pthread_mutex_lock(&ctrl->mutex);
+    ctrl->paused = false;
+    pthread_cond_broadcast(&ctrl->cond); // 唤醒等待的线程
+    pthread_mutex_unlock(&ctrl->mutex);
+}
+
 /**
  * @brief   This function sets a hook function when the system suspend a thread.
  *

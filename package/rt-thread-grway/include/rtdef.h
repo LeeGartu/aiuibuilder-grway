@@ -51,8 +51,10 @@
 
 #include <rtconfig.h>
 #ifdef RT_USING_LIBC
+#include <pthread.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -62,6 +64,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// 控制结构
+typedef struct {
+    bool paused;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+} thread_control_t;
 
 /**
  * @addtogroup BasicDef

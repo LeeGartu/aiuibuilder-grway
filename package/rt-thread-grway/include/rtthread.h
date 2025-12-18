@@ -32,6 +32,9 @@
 extern "C" {
 #endif
 
+void pause_thread(thread_control_t *ctrl);
+void resume_thread(thread_control_t *ctrl);
+
 /**
  * @addtogroup KernelObject
  */

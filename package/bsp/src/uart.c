@@ -35,45 +35,50 @@ int get_port_cfg(struct serial_configure *cfg)
     count--;
     
     // 获取串口名
-    while (1) {
-        printf("\nEnter port index 0~%d ('q' to quit): ", count);
-        char input[256];
-        if (fgets(input, sizeof(input), stdin) == NULL) return -1;
+    // while (1) {
+    //     printf("\nEnter port index 0~%d ('q' to quit): ", count);
+    //     char input[256];
+    //     if (fgets(input, sizeof(input), stdin) == NULL) return -1;
 
-        if (input[0] >= '0' && input[0] <= ('0'+count)) {
-            cfg->uart_index = atoi(input);
-            break;
-        } else if (input[0] == 'q') {
-            sp_free_port_list(ports);
-            return -1;
-        }
-    }
+    //     if (input[0] >= '0' && input[0] <= ('0'+count)) {
+    //         cfg->uart_index = atoi(input);
+    //         break;
+    //     } else if (input[0] == 'q') {
+    //         sp_free_port_list(ports);
+    //         return -1;
+    //     }
+    // }
 
     // 获取串口配置
-    while (1) {
-        printf("\nEnter baudrate databits parity stopbits ('q' to quit)");
-        printf("\nExample: 9600 8 0 1 (N=0, O=1, E=2):");
-        char input[256];
-        if (fgets(input, sizeof(input), stdin) == NULL) return -1;
-        if (input[0] == 'q') {
-            ret = -1;
-            break;
-        }
-        int32_t data_bits,parity,stop_bits;
-        if (sscanf(input, "%d %d %c %d", &cfg->baud_rate, &data_bits, &parity, &stop_bits) == 4) {
-            cfg->data_bits = data_bits;
-            cfg->parity = parity;
-            cfg->stop_bits = stop_bits;
-            break;
-        }
-    }
+    // while (1) {
+    //     printf("\nEnter baudrate databits parity stopbits ('q' to quit)");
+    //     printf("\nExample: 9600 8 0 1 (N=0, O=1, E=2):");
+    //     char input[256];
+    //     if (fgets(input, sizeof(input), stdin) == NULL) return -1;
+    //     if (input[0] == 'q') {
+    //         ret = -1;
+    //         break;
+    //     }
+    //     int32_t data_bits,parity,stop_bits;
+    //     if (sscanf(input, "%d %d %c %d", &cfg->baud_rate, &data_bits, &parity, &stop_bits) == 4) {
+    //         cfg->data_bits = data_bits;
+    //         cfg->parity = parity;
+    //         cfg->stop_bits = stop_bits;
+    //         break;
+    //     }
+    // }
+    cfg->uart_index = 1;
+    cfg->baud_rate = 9600;
+    cfg->data_bits = 8;
+    cfg->parity = 0;
+    cfg->stop_bits = 1;
 
     sp_free_port_list(ports);
 
     return ret;
 }
 
-int open_port(struct sp_port *port, struct serial_configure *cfg)
+int open_port(struct sp_port **port, struct serial_configure *cfg)
 {
     struct sp_port **ports;
 
@@ -83,30 +88,22 @@ int open_port(struct sp_port *port, struct serial_configure *cfg)
         fprintf(stderr, "Failed to list ports\n");
         return -1;
     }
-    port = ports[cfg->uart_index];
+    *port = ports[cfg->uart_index];
 
     // 打开串口
-    if (sp_open(port, SP_MODE_READ_WRITE) != SP_OK) {
+    if (sp_open(*port, SP_MODE_READ_WRITE) != SP_OK) {
         fprintf(stderr, "Cannot open port %d\n", cfg->uart_index);
-        sp_free_port(port);
+        sp_free_port(*port);
         return -1;
     }
 
     // 设置常用参数
-    sp_set_baudrate(port, cfg->baud_rate);
-    sp_set_bits(port, cfg->data_bits);
-    sp_set_parity(port, cfg->parity);
-    sp_set_stopbits(port, cfg->stop_bits);
+    sp_set_baudrate(*port, cfg->baud_rate);
+    sp_set_bits(*port, cfg->data_bits);
+    sp_set_parity(*port, cfg->parity);
+    sp_set_stopbits(*port, cfg->stop_bits);
 
-    printf("Port %d opened at %u %d %d %d\n", cfg->uart_index, cfg->baud_rate, cfg->data_bits, cfg->parity, cfg->stop_bits);
-
-    return 0;
-}
-
-int selectport(struct sp_port *port)
-{
-    if (get_port_cfg(&serial.config) < 0) return -1;
-    if (open_port(port, &serial.config) < 0) return -1;
+    printf("%s opened at %u %d %d %d\n", sp_get_port_name(*port), cfg->baud_rate, cfg->data_bits, cfg->parity, cfg->stop_bits);
 
     return 0;
 }
@@ -179,13 +176,24 @@ const struct rt_uart_ops drv_uart_ops =
     drv_uart_getc,
 };
 
+rt_err_t port_rx_ind(rt_device_t dev, rt_size_t size)
+{
+    uint8_t buf[1024];
+    rt_device_read(dev, 0, buf, size);
+
+    printf("uart_rx: %s\n", buf);
+}
+
 int uart_init(void)
 {
     struct sp_port *port;
+    if (get_port_cfg(&serial.config) < 0) return -1;
+    if (open_port(&port, &serial.config) < 0) return -1;
 
-    if (selectport(port) < 0) return -1;
-
-    rt_hw_serial_register(&serial, "uart1", 259, port);
+    rt_hw_serial_register(&serial, "uart1", RT_DEVICE_FLAG_RDWR, port);
+    struct rt_device *dev = rt_device_find("uart1");
+    rt_device_set_rx_indicate(dev, port_rx_ind);
+    rt_device_open(dev, RT_DEVICE_OFLAG_RDWR);
 
     return 0;
 }
