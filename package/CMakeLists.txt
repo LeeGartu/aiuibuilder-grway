@@ -32,6 +32,6 @@ target_include_directories(p PUBLIC
     ${PROJECT_SOURCE_DIR}/mach/inc/
 )
 
-add_subdirectory(pt-thread)
+add_subdirectory(ptthread)
 target_link_libraries(p PUBLIC ptthread)
 target_link_libraries(p PRIVATE libserialport)
