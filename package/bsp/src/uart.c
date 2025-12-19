@@ -11,8 +11,10 @@ struct rt_serial_device serial;
 
 int get_port_cfg(struct serial_configure *cfg)
 {
-    struct sp_port **ports;
+    int get_ini(struct serial_configure* cfg);
+    int set_ini(struct serial_configure* cfg);
 
+    struct sp_port **ports;
     enum sp_return ret = sp_list_ports(&ports);
     
     if (ret != SP_OK) {
@@ -32,48 +34,44 @@ int get_port_cfg(struct serial_configure *cfg)
         const char *desc = sp_get_port_description(ports[count]);
         printf("  [%d] %s (%s)\n", count, name, desc ? desc : "no description");
     }
+    sp_free_port_list(ports);
     count--;
     
     // 获取串口名
-    // while (1) {
-    //     printf("\nEnter port index 0~%d ('q' to quit): ", count);
-    //     char input[256];
-    //     if (fgets(input, sizeof(input), stdin) == NULL) return -1;
+    while (1) {
+        printf("\nEnter port index 0~%d ('q' to quit): ", count);
+        char input[256];
+        if (fgets(input, sizeof(input), stdin) == NULL) return -1;
 
-    //     if (input[0] >= '0' && input[0] <= ('0'+count)) {
-    //         cfg->uart_index = atoi(input);
-    //         break;
-    //     } else if (input[0] == 'q') {
-    //         sp_free_port_list(ports);
-    //         return -1;
-    //     }
-    // }
+        if (input[0] >= '0' && input[0] <= ('0'+count)) {
+            cfg->uart_index = atoi(input);
+            break;
+        } else if (input[0] == 'q') {
+            return -1;
+        } else if (input[0] == '\r' || input[0] == '\n') {
+            return get_ini(cfg);
+        }
+    }
 
     // 获取串口配置
-    // while (1) {
-    //     printf("\nEnter baudrate databits parity stopbits ('q' to quit)");
-    //     printf("\nExample: 9600 8 0 1 (N=0, O=1, E=2):");
-    //     char input[256];
-    //     if (fgets(input, sizeof(input), stdin) == NULL) return -1;
-    //     if (input[0] == 'q') {
-    //         ret = -1;
-    //         break;
-    //     }
-    //     int32_t data_bits,parity,stop_bits;
-    //     if (sscanf(input, "%d %d %c %d", &cfg->baud_rate, &data_bits, &parity, &stop_bits) == 4) {
-    //         cfg->data_bits = data_bits;
-    //         cfg->parity = parity;
-    //         cfg->stop_bits = stop_bits;
-    //         break;
-    //     }
-    // }
-    cfg->uart_index = 1;
-    cfg->baud_rate = 9600;
-    cfg->data_bits = 8;
-    cfg->parity = 0;
-    cfg->stop_bits = 1;
-
-    sp_free_port_list(ports);
+    while (1) {
+        printf("\nEnter baudrate databits parity stopbits ('q' to quit)");
+        printf("\nExample: 9600 8 0 1 (N=0, O=1, E=2):");
+        char input[256];
+        if (fgets(input, sizeof(input), stdin) == NULL) return -1;
+        if (input[0] == 'q') {
+            ret = -1;
+            break;
+        }
+        int32_t data_bits,parity,stop_bits;
+        if (sscanf(input, "%d %d %c %d", &cfg->baud_rate, &data_bits, &parity, &stop_bits) == 4) {
+            cfg->data_bits = data_bits;
+            cfg->parity = parity;
+            cfg->stop_bits = stop_bits;
+            ret = set_ini(cfg);
+            break;
+        }
+    }
 
     return ret;
 }
@@ -178,7 +176,7 @@ const struct rt_uart_ops drv_uart_ops =
 
 rt_err_t port_rx_ind(rt_device_t dev, rt_size_t size)
 {
-    uint8_t buf[1024];
+    uint8_t buf[255];
     rt_device_read(dev, 0, buf, size);
 
     printf("uart_rx: %s\n", buf);
