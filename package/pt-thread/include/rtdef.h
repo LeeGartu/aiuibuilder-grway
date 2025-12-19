@@ -645,10 +645,6 @@ struct rt_thread
     rt_uint8_t  type;                                   /**< type of object */
     rt_uint8_t  flags;                                  /**< thread's flags */
 
-#ifdef RT_USING_MODULE
-    void       *module_id;                              /**< id of application module */
-#endif /* RT_USING_MODULE */
-
     rt_list_t   list;                                   /**< the object list */
     rt_list_t   tlist;                                  /**< the thread list */
 
@@ -664,21 +660,8 @@ struct rt_thread
 
     rt_uint8_t  stat;                                   /**< thread status */
 
-#ifdef RT_USING_SMP
-    rt_uint8_t  bind_cpu;                               /**< thread is bind to cpu */
-    rt_uint8_t  oncpu;                                  /**< process on cpu */
-
-    rt_uint16_t scheduler_lock_nest;                    /**< scheduler lock count */
-    rt_uint16_t cpus_lock_nest;                         /**< cpus lock count */
-    rt_uint16_t critical_lock_nest;                     /**< critical lock count */
-#endif /*RT_USING_SMP*/
-
     /* priority */
     rt_uint8_t  current_priority;                       /**< current priority */
-#if RT_THREAD_PRIORITY_MAX > 32
-    rt_uint8_t  number;
-    rt_uint8_t  high_mask;
-#endif /* RT_THREAD_PRIORITY_MAX > 32 */
     rt_uint32_t number_mask;
 
 #ifdef RT_USING_EVENT
@@ -687,36 +670,18 @@ struct rt_thread
     rt_uint8_t  event_info;
 #endif /* RT_USING_EVENT */
 
-#ifdef RT_USING_SIGNALS
-    rt_sigset_t     sig_pending;                        /**< the pending signals */
-    rt_sigset_t     sig_mask;                           /**< the mask bits of signal */
-
-#ifndef RT_USING_SMP
-    void            *sig_ret;                           /**< the return stack pointer from signal */
-#endif /* RT_USING_SMP */
-    rt_sighandler_t *sig_vectors;                       /**< vectors of signal handler */
-    void            *si_list;                           /**< the signal infor list */
-#endif /* RT_USING_SIGNALS */
-
     rt_ubase_t  init_tick;                              /**< thread's initialized tick */
     rt_ubase_t  remaining_tick;                         /**< remaining tick */
-
-#ifdef RT_USING_CPU_USAGE
-    rt_uint64_t  duration_tick;                         /**< cpu usage tick */
-#endif /* RT_USING_CPU_USAGE */
-
-#ifdef RT_USING_PTHREADS
-    void  *pthread_data;                                /**< the handle of pthread data, adapt 32/64bit */
-#endif /* RT_USING_PTHREADS */
 
     struct rt_timer thread_timer;                       /**< built-in thread timer */
 
     void (*cleanup)(struct rt_thread *tid);             /**< cleanup function when thread exit */
 
-    /* light weight process if present */
-#ifdef RT_USING_LWP
-    void        *lwp;
-#endif /* RT_USING_LWP */
+    /* pthread compatibility layer */
+    pthread_t tid;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    int suspended;
 
     rt_ubase_t user_data;                             /**< private user data beyond this thread */
 };

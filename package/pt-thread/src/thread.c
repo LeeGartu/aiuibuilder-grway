@@ -275,25 +275,7 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* calculate priority attribute */
-#if RT_THREAD_PRIORITY_MAX > 32
-    thread->number      = thread->current_priority >> 3;            /* 5bit */
-    thread->number_mask = 1L << thread->number;
-    thread->high_mask   = 1L << (thread->current_priority & 0x07);  /* 3bit */
-#else
-    thread->number_mask = 1L << thread->current_priority;
-#endif /* RT_THREAD_PRIORITY_MAX > 32 */
-
-    RT_DEBUG_LOG(RT_DEBUG_THREAD, ("startup a thread:%s with priority:%d\n",
-                                   thread->name, thread->current_priority));
-    /* change thread stat */
-    thread->stat = RT_THREAD_SUSPEND;
-    /* then resume it */
-    rt_thread_resume(thread);
-    if (rt_thread_self() != RT_NULL)
-    {
-        /* do a scheduling */
-        rt_schedule();
-    }
+    
 
     return RT_EOK;
 }
@@ -377,26 +359,12 @@ rt_thread_t rt_thread_create(const char *name,
 
     thread = (struct rt_thread *)rt_object_allocate(RT_Object_Class_Thread,
                                                     name);
-    if (thread == RT_NULL)
-        return RT_NULL;
-
-    stack_start = (void *)RT_KERNEL_MALLOC(stack_size);
-    if (stack_start == RT_NULL)
-    {
-        /* allocate stack failure */
-        rt_object_delete((rt_object_t)thread);
-
-        return RT_NULL;
-    }
-
-    _thread_init(thread,
-                 name,
-                 entry,
-                 parameter,
-                 stack_start,
-                 stack_size,
-                 priority,
-                 tick);
+    
+    thread->entry = entry;
+    thread->parameter = parameter;
+    thread->suspended = 0;
+    pthread_mutex_init(&thread->mutex, NULL);
+    pthread_cond_init(&thread->cond, NULL);
 
     return thread;
 }
@@ -754,37 +722,9 @@ RTM_EXPORT(rt_thread_control);
  */
 rt_err_t rt_thread_suspend(rt_thread_t thread)
 {
-    rt_base_t stat;
-    rt_base_t level;
-
-    /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
-    RT_ASSERT(thread == rt_thread_self());
-
-    RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend:  %s\n", thread->name));
-
-    stat = thread->stat & RT_THREAD_STAT_MASK;
-    if ((stat != RT_THREAD_READY) && (stat != RT_THREAD_RUNNING))
-    {
-        RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend: thread disorder, 0x%2x\n", thread->stat));
-        return -RT_ERROR;
-    }
-
-    /* disable interrupt */
-    level = rt_hw_interrupt_disable();
-
-    /* change thread stat */
-    rt_schedule_remove_thread(thread);
-    thread->stat = RT_THREAD_SUSPEND | (thread->stat & ~RT_THREAD_STAT_MASK);
-
-    /* stop thread timer anyway */
-    rt_timer_stop(&(thread->thread_timer));
-
-    /* enable interrupt */
-    rt_hw_interrupt_enable(level);
-
-    RT_OBJECT_HOOK_CALL(rt_thread_suspend_hook, (thread));
+    pthread_mutex_lock(&thread->mutex);
+    thread->suspended = 1;
+    pthread_mutex_unlock(&thread->mutex);
     return RT_EOK;
 }
 RTM_EXPORT(rt_thread_suspend);
@@ -799,37 +739,10 @@ RTM_EXPORT(rt_thread_suspend);
  */
 rt_err_t rt_thread_resume(rt_thread_t thread)
 {
-    rt_base_t level;
-
-    /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
-
-    RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread resume:  %s\n", thread->name));
-
-    if ((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_SUSPEND)
-    {
-        RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread resume: thread disorder, %d\n",
-                                       thread->stat));
-
-        return -RT_ERROR;
-    }
-
-    /* disable interrupt */
-    level = rt_hw_interrupt_disable();
-
-    /* remove from suspend list */
-    rt_list_remove(&(thread->tlist));
-
-    rt_timer_stop(&thread->thread_timer);
-
-    /* insert to schedule ready list */
-    rt_schedule_insert_thread(thread);
-
-    /* enable interrupt */
-    rt_hw_interrupt_enable(level);
-
-    RT_OBJECT_HOOK_CALL(rt_thread_resume_hook, (thread));
+    pthread_mutex_lock(&thread->mutex);
+    thread->suspended = 0;
+    pthread_cond_signal(&thread->cond);
+    pthread_mutex_unlock(&thread->mutex);
     return RT_EOK;
 }
 RTM_EXPORT(rt_thread_resume);
