@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 project(p)
 set(CMAKE_C_STANDARD 11)#C11
 set(CMAKE_CXX_STANDARD 17)#C17
@@ -32,6 +32,5 @@ target_include_directories(p PUBLIC
     ${PROJECT_SOURCE_DIR}/mach/inc/
 )
 
-add_subdirectory(ptthread)
 target_link_libraries(p PUBLIC ptthread)
-target_link_libraries(p PRIVATE libserialport)
+target_link_libraries(p PUBLIC libserialport)
