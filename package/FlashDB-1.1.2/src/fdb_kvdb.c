@@ -64,12 +64,16 @@
 
 #define SECTOR_NUM                               (db_max_size(db) / db_sec_size(db))
 
+#include <stddef.h>
 #define SECTOR_HDR_DATA_SIZE                     (FDB_WG_ALIGN(sizeof(struct sector_hdr_data)))
-#define SECTOR_DIRTY_OFFSET                      ((unsigned long)(&((struct sector_hdr_data *)0)->status_table.dirty))
+// #define SECTOR_DIRTY_OFFSET                      ((unsigned long)(&((struct sector_hdr_data *)0)->status_table.dirty))
+#define SECTOR_DIRTY_OFFSET                      offsetof(struct sector_hdr_data, status_table.dirty)
 #define KV_HDR_DATA_SIZE                         (FDB_WG_ALIGN(sizeof(struct kv_hdr_data)))
-#define KV_MAGIC_OFFSET                          ((unsigned long)(&((struct kv_hdr_data *)0)->magic))
+// #define KV_MAGIC_OFFSET                          ((unsigned long)(&((struct kv_hdr_data *)0)->magic))
+#define KV_MAGIC_OFFSET                          offsetof(struct kv_hdr_data, magic)
 #define KV_LEN_OFFSET                            ((unsigned long)(&((struct kv_hdr_data *)0)->len))
-#define KV_NAME_LEN_OFFSET                       ((unsigned long)(&((struct kv_hdr_data *)0)->name_len))
+// #define KV_NAME_LEN_OFFSET                       ((unsigned long)(&((struct kv_hdr_data *)0)->name_len))
+#define KV_NAME_LEN_OFFSET                       offsetof(struct kv_hdr_data, name_len)
 
 #define db_name(db)                              (((fdb_db_t)db)->name)
 #define db_init_ok(db)                           (((fdb_db_t)db)->init_ok)

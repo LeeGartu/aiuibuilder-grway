@@ -4,8 +4,8 @@
             "name": "mingw",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/package/rt-thread-grway/include",
-                "${workspaceFolder}/package/rt-thread-grway/components/drivers/include"
+                "${workspaceFolder}/package/ptthread/include",
+                "${workspaceFolder}/package/ptthread/components/drivers/include"
             ],
             "defines": [
                 "_DEBUG",

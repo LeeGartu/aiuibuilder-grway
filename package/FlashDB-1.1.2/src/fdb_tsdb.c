@@ -32,15 +32,28 @@
 
 #define SECTOR_HDR_DATA_SIZE                     (FDB_WG_ALIGN(sizeof(struct sector_hdr_data)))
 #define LOG_IDX_DATA_SIZE                        (FDB_WG_ALIGN(sizeof(struct log_idx_data)))
-#define LOG_IDX_TS_OFFSET                        ((unsigned long)(&((struct log_idx_data *)0)->time))
-#define SECTOR_MAGIC_OFFSET                      ((unsigned long)(&((struct sector_hdr_data *)0)->magic))
-#define SECTOR_START_TIME_OFFSET                 ((unsigned long)(&((struct sector_hdr_data *)0)->start_time))
-#define SECTOR_END0_TIME_OFFSET                  ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].time))
-#define SECTOR_END0_IDX_OFFSET                   ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].index))
-#define SECTOR_END0_STATUS_OFFSET                ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].status))
-#define SECTOR_END1_TIME_OFFSET                  ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].time))
-#define SECTOR_END1_IDX_OFFSET                   ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].index))
-#define SECTOR_END1_STATUS_OFFSET                ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].status))
+// #define LOG_IDX_TS_OFFSET                        ((unsigned long)(&((struct log_idx_data *)0)->time))
+// #define SECTOR_MAGIC_OFFSET                      ((unsigned long)(&((struct sector_hdr_data *)0)->magic))
+// #define SECTOR_START_TIME_OFFSET                 ((unsigned long)(&((struct sector_hdr_data *)0)->start_time))
+// #define SECTOR_END0_TIME_OFFSET                  ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].time))
+// #define SECTOR_END0_IDX_OFFSET                   ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].index))
+// #define SECTOR_END0_STATUS_OFFSET                ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[0].status))
+// #define SECTOR_END1_TIME_OFFSET                  ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].time))
+// #define SECTOR_END1_IDX_OFFSET                   ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].index))
+// #define SECTOR_END1_STATUS_OFFSET                ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].status))
+#include <stddef.h>
+/* 基础成员偏移量 */
+#define LOG_IDX_TS_OFFSET             offsetof(struct log_idx_data, time)
+#define SECTOR_MAGIC_OFFSET           offsetof(struct sector_hdr_data, magic)
+#define SECTOR_START_TIME_OFFSET      offsetof(struct sector_hdr_data, start_time)
+#define SECTOR_END_INFO_OFFSET        offsetof(struct sector_hdr_data, end_info)
+/* 嵌套成员偏移量 - 通过组合基础偏移量计算 */
+#define SECTOR_END0_TIME_OFFSET       (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[0]), time))
+#define SECTOR_END0_IDX_OFFSET        (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[0]), index))
+#define SECTOR_END0_STATUS_OFFSET     (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[0]), status))
+#define SECTOR_END1_TIME_OFFSET       (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[1]), time))
+#define SECTOR_END1_IDX_OFFSET        (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[1]), index))
+#define SECTOR_END1_STATUS_OFFSET     (SECTOR_END_INFO_OFFSET + offsetof(typeof(((struct sector_hdr_data *)0)->end_info[1]), status))
 
 /* the next address is get failed */
 #define FAILED_ADDR                              0xFFFFFFFF

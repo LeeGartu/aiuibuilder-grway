@@ -11,6 +11,7 @@
 	},
 	"files.exclude": {
 		"build": true,
+		"package/FlashDB*/demos": true,
 		"data": true,
 		"resources": true,
 		"simulator/build": true,
@@ -21,6 +22,7 @@
 	},
 	"search.exclude": {
 		"build": true,
+		"package/FlashDB*/demos": true,
 		"data": true,
 		"resources": true,
 		"simulator": true,
