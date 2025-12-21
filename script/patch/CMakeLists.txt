@@ -3,5 +3,6 @@ project(uibuilder)
 
 option(UI_BUILD_FROM_ROOT "Output to build of root" ON)
 add_subdirectory(package)
+add_subdirectory(package/ptthread)
 add_subdirectory(simulator)
 

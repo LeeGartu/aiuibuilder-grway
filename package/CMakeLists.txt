@@ -33,4 +33,3 @@ target_include_directories(p PUBLIC
 )
 
 target_link_libraries(p PUBLIC ptthread)
-target_link_libraries(p PUBLIC libserialport)
