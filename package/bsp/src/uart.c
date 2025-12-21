@@ -7,6 +7,11 @@
 #include "uart.h"
 #include "libserialport.h"
 
+#define LOG_TAG              "uart"
+#define LOG_LVL              LOG_LVL_DBG
+#define ULOG_OUTPUT_LVL                LOG_LVL_DBG
+#include "ulog.h"
+
 struct rt_serial_device serial;
 
 int get_port_cfg(struct serial_configure *cfg)
@@ -23,7 +28,8 @@ int get_port_cfg(struct serial_configure *cfg)
     }
 
     if (ports[0] == NULL) {
-        printf("  No serial ports found.\n");
+        printf("No serial ports found.\n");
+        LOG_E("No serial ports found.\n");
         return -1;
     }
 
