@@ -101,7 +101,7 @@ int get_ini(struct serial_configure* cfg)
         printf("uart.ini not found, creating default configuration...\n");
         if (_set_ini(&config) < 0) {
             printf("Failed to create default configuration file\n");
-            return -1;
+            return -1;;
         }
     }
 
