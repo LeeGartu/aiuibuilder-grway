@@ -1,0 +1,1 @@
+将 tool 复制到 C:\ArtInChip\AiUIBuilder（这个是默认安装路径，根据自己安装的路径修改）

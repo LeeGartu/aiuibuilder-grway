@@ -13,7 +13,7 @@
                 "_UNICODE",
                 "LVGL_DIR=\"L:/assets/\""
             ],
-            "compilerPath": "C:/msys64/mingw64/bin/gcc.exe",
+            "compilerPath": "C:/ArtInChip/AiUIBuilder/tool/mingw/bin/gcc.exe",
             "cStandard": "c17",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "windows-gcc-x64"
