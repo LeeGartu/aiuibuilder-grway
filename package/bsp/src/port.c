@@ -2,7 +2,6 @@
 
 int port_entry(void)
 {
-    printf("\nhello from %s", __FILE__);
     return 0;
 }
 

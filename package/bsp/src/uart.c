@@ -9,7 +9,6 @@
 
 #define LOG_TAG              "uart"
 #define LOG_LVL              LOG_LVL_DBG
-#define ULOG_OUTPUT_LVL                LOG_LVL_DBG
 #include "ulog.h"
 
 struct rt_serial_device serial;
@@ -23,12 +22,11 @@ int get_port_cfg(struct serial_configure *cfg)
     enum sp_return ret = sp_list_ports(&ports);
     
     if (ret != SP_OK) {
-        fprintf(stderr, "Failed to list ports\n");
+        LOG_E("Failed to list ports\n");
         return -1;
     }
 
     if (ports[0] == NULL) {
-        printf("No serial ports found.\n");
         LOG_E("No serial ports found.\n");
         return -1;
     }
@@ -89,14 +87,14 @@ int open_port(struct sp_port **port, struct serial_configure *cfg)
     enum sp_return ret = sp_list_ports(&ports);
     
     if (ret != SP_OK) {
-        fprintf(stderr, "Failed to list ports\n");
+        LOG_E("Failed to list ports\n");
         return -1;
     }
     *port = ports[cfg->uart_index];
 
     // 打开串口
     if (sp_open(*port, SP_MODE_READ_WRITE) != SP_OK) {
-        fprintf(stderr, "Cannot open port %d\n", cfg->uart_index);
+        LOG_E("Cannot open port %d\n", cfg->uart_index);
         sp_free_port(*port);
         return -1;
     }
@@ -185,7 +183,7 @@ rt_err_t port_rx_ind(rt_device_t dev, rt_size_t size)
     uint8_t buf[255];
     rt_device_read(dev, 0, buf, size);
 
-    printf("uart_rx: %s\n", buf);
+    LOG_D("uart_rx: %s\n", buf);
 }
 
 int uart_init(void)
