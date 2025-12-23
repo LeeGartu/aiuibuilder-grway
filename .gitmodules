@@ -1,3 +1,7 @@
 [submodule "package/ptthread"]
 	path = package/ptthread
 	url = https://github.com/LeeGartu/ptthread
+
+[submodule "package/inih"]
+    path = package/inih
+    url = https://github.com/benhoyt/inih.git
