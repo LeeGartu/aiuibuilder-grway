@@ -6,13 +6,13 @@
 
 void port_timer(void *param)
 {
-    printf("hello from %s\n", __FILE__);
+    LOG_D("hello from %s\n", __FILE__);
 }
 
 int port_entry(void)
 {
     LOG_D("create timer");
-    rt_timer_t _port_timer = rt_timer_create("port_timer", port_timer, NULL, 1000, RT_TIMER_FLAG_PERIODIC|RT_TIMER_FLAG_SOFT_TIMER);
+    rt_timer_t _port_timer = rt_timer_create("port_timer", port_timer, NULL, 1000, RT_TIMER_FLAG_PERIODIC);
     LOG_D("start timer");
     rt_timer_start(_port_timer);
 
